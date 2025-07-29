@@ -1,0 +1,14 @@
+.page__not-found {
+  align-items: center;
+};
+
+.link__not-found {
+  font-size: 150%;
+  text-decoration: underline;
+};
+
+.img__not-found {
+  margin-bottom: 50px;
+  max-width: 100%;
+  height: auto;
+};
