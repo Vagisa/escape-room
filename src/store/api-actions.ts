@@ -2,10 +2,11 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { FullQuestType, QuestType } from '../types/quest';
 import { AppDispatch, State } from '../types/state';
 import { AxiosInstance } from 'axios';
-import { APIRoute } from '../utils/const';
+import { APIRoute, AppRoute } from '../utils/const';
 import { BookingInfoType, FullBookingType, PostBookingArg } from '../types/booking';
 import { AuthDataType, AuthInfoType } from '../types/user';
 import { dropToken, saveToken } from '../services/token';
+import { redirectToRoute } from './action';
 
 export const fetchQuestsAction = createAsyncThunk<QuestType[], undefined, {
   dispatch: AppDispatch;
@@ -105,9 +106,10 @@ export const loginAction = createAsyncThunk<AuthInfoType, AuthDataType, {
   extra: AxiosInstance;
 }>(
   'user/login',
-  async ({email, password}, { extra: api }) => {
+  async ({email, password}, { dispatch, extra: api }) => {
     const {data} = await api.post<AuthInfoType>(APIRoute.Login, {email, password});
     saveToken(data.token);
+    dispatch(redirectToRoute(AppRoute.Root));
 
     return data;
   },

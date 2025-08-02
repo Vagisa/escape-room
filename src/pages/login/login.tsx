@@ -1,4 +1,7 @@
+import { useState } from 'react';
+
 function Login(): JSX.Element {
+  const [isChecked, setIsChecked] = useState(false);
   return (
     <main className="decorated-page login">
       <div className="decorated-page__decor" aria-hidden="true">
@@ -63,7 +66,9 @@ function Login(): JSX.Element {
                 type="checkbox"
                 id="id-order-agreement"
                 name="user-agreement"
+                checked={isChecked}
                 required
+                onChange={(evt) => setIsChecked(evt.target.checked)}
               />
               <span className="custom-checkbox__icon">
                 <svg width="20" height="17" aria-hidden="true">

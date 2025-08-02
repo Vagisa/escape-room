@@ -6,6 +6,9 @@ import HistoryRouter from './components/history-router/history-router';
 import browserHistory from './browser-history';
 import { ToastContainer } from 'react-toastify';
 import App from './components/app/app';
+import { fetchQuestsAction } from './store/api-actions';
+
+store.dispatch(fetchQuestsAction());
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
