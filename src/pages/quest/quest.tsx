@@ -1,4 +1,38 @@
+import { useParams } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { selectQuest, selectQuestPageLoading } from '../../store/selectors/booking';
+import { useEffect } from 'react';
+import { fetchBookingInfoAction, fetchQuestAction } from '../../store/api-actions';
+import { resetQuestData } from '../../store/booking/booking-reducer';
+import LoadingScreen from '../loading-screen/loading-screen';
+import NotFound from '../not-found/not-found';
+
 function Quest(): JSX.Element {
+  const quest = useAppSelector(selectQuest);
+  const questPageIsLoading = useAppSelector(selectQuestPageLoading);
+
+  const { id } = useParams();
+
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchQuestAction(id));
+      dispatch(fetchBookingInfoAction(id));
+    }
+
+    return () => {
+      dispatch(resetQuestData());
+    };
+  }, [dispatch, id]);
+
+  if (questPageIsLoading) {
+    return <LoadingScreen />;
+  }
+
+  if (!quest) {
+    return <NotFound />;
+  }
+
   return (
     <main className="decorated-page quest-page">
       <div className="decorated-page__decor" aria-hidden="true">
