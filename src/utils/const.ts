@@ -26,3 +26,24 @@ export enum Level {
   Medium = 'medium',
   Hard = 'hard',
 }
+
+export enum APIRoute {
+  Quest = '/quest/',
+  Quests = '/quest',
+  Booking = '/booking',
+  Reservation = '/reservation',
+  Login = '/login',
+  Logout = '/logout',
+}
+
+export enum AuthorizationStatus {
+  Auth = 'AUTH',
+  NoAuth = 'NO_AUTH',
+  Unknown = 'UNKNOWN',
+}
+
+export enum NameSpace {
+  Quest = 'QUEST',
+  Booking = 'BOOKING',
+  User = 'USER',
+}

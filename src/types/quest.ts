@@ -15,3 +15,9 @@ export type FullQuestType = QuestType & {
   coverImg: string;
   coverImgWebp: string;
 };
+
+export type QuestReducerType = {
+  quests: QuestType[];
+  isQuestsLoading: boolean;
+  hasError: boolean;
+};

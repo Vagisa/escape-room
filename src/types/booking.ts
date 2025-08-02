@@ -1,5 +1,5 @@
 import { BookingDate } from '../utils/const';
-import { QuestType } from './quest';
+import { FullQuestType, QuestType } from './quest';
 
 export type BookingUserType = {
   date: BookingDate;
@@ -9,6 +9,11 @@ export type BookingUserType = {
   withChildren: boolean;
   peopleCount: number;
   placeId: string;
+};
+
+export type PostBookingArg = {
+  questId: string;
+  bookingUserData: BookingUserType;
 };
 
 export type TimeSlotType = {
@@ -21,7 +26,7 @@ export type LocationType = {
   coords: [number, number];
 };
 
-export type BookingInformationType = {
+export type BookingInfoType = {
   id: string;
   location: LocationType;
   slots: {
@@ -36,4 +41,10 @@ export type FullBookingType = Omit<BookingUserType, BookingRemovedKeys> & {
   id: string;
   location: LocationType;
   quest: QuestType;
+};
+
+export type BookingReducerType = {
+  quest: FullQuestType | null;
+  bookings: BookingInfoType[];
+  isQuestPageLoading: boolean;
 };
