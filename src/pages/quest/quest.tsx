@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { selectQuest, selectQuestPageLoading } from '../../store/selectors/booking';
 import { useEffect } from 'react';
@@ -6,6 +6,7 @@ import { fetchBookingInfoAction, fetchQuestAction } from '../../store/api-action
 import { resetQuestData } from '../../store/booking/booking-reducer';
 import LoadingScreen from '../loading-screen/loading-screen';
 import NotFound from '../not-found/not-found';
+import { AppRoute } from '../../utils/const';
 
 function Quest(): JSX.Element {
   const quest = useAppSelector(selectQuest);
@@ -87,12 +88,12 @@ function Quest(): JSX.Element {
           <p className="quest-page__description">
             {description}
           </p>
-          <a
+          <Link
             className="btn btn--accent btn--cta quest-page__btn"
-            href="booking.html"
+            to={AppRoute.Booking}
           >
             Забронировать
-          </a>
+          </Link>
         </div>
       </div>
     </main>

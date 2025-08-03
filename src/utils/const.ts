@@ -66,6 +66,11 @@ export const LevelLabels: Record<Level, string> = {
   [Level.Hard]: 'Сложный',
 };
 
+export const BookingDateLabel: Record<BookingDate, string> = {
+  [BookingDate.Today]: 'сегодня',
+  [BookingDate.Tomorrow]: 'завтра',
+};
+
 export const SvgGenreWidth: Record<QuestGenre, string> = {
   [QuestGenre.All]: '26',
   [QuestGenre.Adventures]: '36',

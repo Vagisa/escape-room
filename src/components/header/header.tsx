@@ -1,9 +1,18 @@
 import { Link } from 'react-router-dom';
 import { AppRoute } from '../../utils/const';
 import { useAuth } from '../../hooks/auth';
+import { useAppDispatch } from '../../hooks';
+import { MouseEvent } from 'react';
+import { logoutAction } from '../../store/api-actions';
 
 function Header(): JSX.Element {
   const userIsAuth = useAuth();
+  const dispatch = useAppDispatch();
+
+  const handleLogout = (evt: MouseEvent<HTMLAnchorElement>) => {
+    evt.preventDefault();
+    dispatch(logoutAction());
+  };
   return (
     <header className="header">
       <div className="container container--size-l">
@@ -39,7 +48,11 @@ function Header(): JSX.Element {
         <div className="header__side-nav">
           {userIsAuth
             ?
-            <Link className="btn btn--accent header__side-item" to={AppRoute.Root}>
+            <Link
+              className="btn btn--accent header__side-item"
+              onClick={handleLogout}
+              to={AppRoute.Root}
+            >
               Выйти
             </Link>
             :

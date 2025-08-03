@@ -1,15 +1,41 @@
-import { useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import { useAuth } from '../../hooks/auth';
 import { Navigate } from 'react-router-dom';
 import { AppRoute } from '../../utils/const';
+import { loginAction } from '../../store/api-actions';
+import { useAppDispatch } from '../../hooks';
 
 function Login(): JSX.Element {
   const userIsAuth = useAuth();
   const [isChecked, setIsChecked] = useState(false);
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  const passwordReff = useRef<HTMLInputElement | null>(null);
+
+  const dispatch = useAppDispatch();
 
   if (userIsAuth) {
     return <Navigate to={AppRoute.Root} />;
   }
+
+  const validatePassword = () => {
+    if (passwordReff === null || passwordReff.current === null) {
+      return false;
+    }
+    const containsAtLeastOneNumber = /\d/.test(passwordReff.current.value);
+    const containsAtLeastOneLetter = /[a-zA-Z]/.test(passwordReff.current.value);
+    return containsAtLeastOneNumber && containsAtLeastOneLetter;
+  };
+
+  const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+
+    if (emailRef.current !== null && validatePassword()) {
+      dispatch(loginAction({
+        email: emailRef.current.value,
+        password: passwordReff?.current?.value || '',
+      }));
+    }
+  };
 
   return (
     <main className="decorated-page login">
@@ -34,6 +60,7 @@ function Login(): JSX.Element {
             className="login-form"
             action="https://echo.htmlacademy.ru/"
             method="post"
+            onSubmit={handleSubmit}
           >
             <div className="login-form__inner-wrapper">
               <h1 className="title title--size-s login-form__title">Вход</h1>
@@ -43,6 +70,7 @@ function Login(): JSX.Element {
                     E&nbsp;&ndash;&nbsp;mail
                   </label>
                   <input
+                    ref={emailRef}
                     type="email"
                     id="email"
                     name="email"
@@ -55,6 +83,7 @@ function Login(): JSX.Element {
                     Пароль
                   </label>
                   <input
+                    ref={passwordReff}
                     type="password"
                     id="password"
                     name="password"

@@ -22,9 +22,11 @@ export const userReducer = createSlice({
   name: NameSpace.User,
   initialState,
   reducers: {
-    resetUserData: (state) => {
-      state.bookings = [];
+    resetUserReservations: (state) => {
       state.reservations = [];
+    },
+    resetBookings: (state) => {
+      state.bookings = [];
     },
   },
   extraReducers(builder) {
@@ -70,4 +72,4 @@ export const userReducer = createSlice({
   }
 });
 
-export const { resetUserData } = userReducer.actions;
+export const { resetBookings, resetUserReservations } = userReducer.actions;

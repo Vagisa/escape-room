@@ -1,4 +1,24 @@
+import { useEffect } from 'react';
+import { fetchReservationAction } from '../../store/api-actions';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { resetUserReservations } from '../../store/user/user-reducer';
+import { selectReservations } from '../../store/selectors/user';
+import { AppRoute } from '../../utils/const';
+import ReservationCard from '../../components/reservation-card/reservation-card';
+import { Link } from 'react-router-dom';
+
 function MyQuests(): JSX.Element {
+  const reservations = useAppSelector(selectReservations);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(fetchReservationAction());
+
+    return () => {
+      dispatch(resetUserReservations());
+    };
+  }, [dispatch]);
+
   return (
     <main className="page-content decorated-page">
       <div className="decorated-page__decor" aria-hidden="true">
@@ -23,6 +43,11 @@ function MyQuests(): JSX.Element {
           </h1>
         </div>
         <div className="cards-grid">
+          {reservations.map((reservation) =>(
+            <ReservationCard
+              key={reservation.id}
+              {...reservation}
+            />))}
           <div className="quest-card">
             <div className="quest-card__img">
               <picture>
@@ -41,9 +66,9 @@ function MyQuests(): JSX.Element {
             </div>
             <div className="quest-card__content">
               <div className="quest-card__info-wrapper">
-                <a className="quest-card__link" href="quest.html">
+                <Link className="quest-card__link" to={AppRoute.Root}>
                   Маньяк
-                </a>
+                </Link>
                 <span className="quest-card__info">
                   [сегодня,&nbsp;17:00. наб. реки Карповки&nbsp;5, лит&nbsp;П
                   <br />
