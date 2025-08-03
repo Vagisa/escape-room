@@ -9,7 +9,7 @@ export enum AppRoute {
 }
 
 export enum QuestGenre {
-  All = 'all',
+  All = 'all-quests',
   Adventures = 'adventures',
   Horror = 'horror',
   Mystic = 'mystic',
@@ -23,7 +23,7 @@ export enum BookingDate {
 }
 
 export enum Level {
-  Every = 'every',
+  Any = 'any',
   Easy = 'easy',
   Medium = 'medium',
   Hard = 'hard',
@@ -60,8 +60,17 @@ export const GenreLabels: Record<QuestGenre, string> = {
 };
 
 export const LevelLabels: Record<Level, string> = {
-  [Level.Every]: 'Любой',
+  [Level.Any]: 'Любой',
   [Level.Easy]: 'Легкий',
   [Level.Medium]: 'Средний',
   [Level.Hard]: 'Сложный',
+};
+
+export const SvgGenreWidth: Record<QuestGenre, string> = {
+  [QuestGenre.All]: '26',
+  [QuestGenre.Adventures]: '36',
+  [QuestGenre.Horror]: '30',
+  [QuestGenre.Mystic]: '30',
+  [QuestGenre.Detective]: '40',
+  [QuestGenre.SciFi]: '28',
 };

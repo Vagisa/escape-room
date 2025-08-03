@@ -8,7 +8,7 @@ const initialState: QuestReducerType = {
   isQuestsLoading: false,
   hasError: false,
   genre: QuestGenre.All,
-  level: Level.Every,
+  level: Level.Any,
 };
 
 export const questReducer = createSlice({
@@ -41,7 +41,7 @@ export const questReducer = createSlice({
         state.quests = action.payload;
         state.isQuestsLoading = false;
         state.genre = QuestGenre.All;
-        state.level = Level.Every;
+        state.level = Level.Any;
       })
       .addCase(fetchQuestsAction.rejected, (state) => {
         state.isQuestsLoading = false;
