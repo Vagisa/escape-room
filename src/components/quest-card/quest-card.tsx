@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { QuestType } from '../../types/quest';
-import { get2xSrc } from '../../utils/utils';
+import { addImageSuffix } from '../../utils/utils';
 import { APIRoute } from '../../utils/const';
 
 type QuestCardProps = {
@@ -23,11 +23,11 @@ function QuestCard({ quest }: QuestCardProps): JSX.Element {
         <picture>
           <source
             type="image/webp"
-            srcSet={`${previewImgWebp}, ${get2xSrc(previewImgWebp)} 2x`}
+            srcSet={`${previewImgWebp}, ${addImageSuffix(previewImgWebp)} 2x`}
           />
           <img
             src={previewImg}
-            srcSet={`${previewImg} 2x`}
+            srcSet={`${addImageSuffix(previewImg)} 2x`}
             width="344"
             height="232"
             alt={title}

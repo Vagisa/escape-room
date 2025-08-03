@@ -20,4 +20,6 @@ export type QuestReducerType = {
   quests: QuestType[];
   isQuestsLoading: boolean;
   hasError: boolean;
+  genre: QuestGenre;
+  level: Level;
 };
