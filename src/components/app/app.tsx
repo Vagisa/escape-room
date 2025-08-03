@@ -13,6 +13,7 @@ import { useAppSelector } from '../../hooks';
 import { selectAuthorizationStatus } from '../../store/selectors/user';
 import { selectQuestsLoadingStatus } from '../../store/selectors/quest';
 import LoadingScreen from '../../pages/loading-screen/loading-screen';
+import PrivateRoute from '../private-route/private-route';
 
 function App(): JSX.Element {
   const authorizationStatus = useAppSelector(selectAuthorizationStatus);
@@ -26,11 +27,34 @@ function App(): JSX.Element {
     <HelmetProvider>
       <Routes>
         <Route path={AppRoute.Root} element={<Layout />}>
-          <Route index element={<Main />} />
-          <Route path={AppRoute.Booking} element={<Booking />} />
-          <Route path={AppRoute.Contacts} element={<Contacts />} />
-          <Route path={AppRoute.Login} element={<Login />} />
-          <Route path={AppRoute.MyQuests} element={<MyQuests />} />
+          <Route
+            index
+            element={<Main />}
+          />
+          <Route
+            path={AppRoute.Booking}
+            element={
+              <PrivateRoute authorizationStatus={authorizationStatus}>
+                <Booking />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path={AppRoute.Contacts}
+            element={<Contacts />}
+          />
+          <Route
+            path={AppRoute.Login}
+            element={<Login />}
+          />
+          <Route
+            path={AppRoute.MyQuests}
+            element={
+              <PrivateRoute authorizationStatus={authorizationStatus}>
+                <MyQuests />
+              </PrivateRoute>
+            }
+          />
           <Route path={AppRoute.Quest} element={<Quest />} />
           <Route path={AppRoute.NotFound} element={<NotFound />} />
         </Route>

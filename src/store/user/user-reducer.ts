@@ -4,6 +4,7 @@ import { AuthorizationStatus, NameSpace } from '../../utils/const.ts';
 import {
   checkAuthAction,
   deleteReservationAction,
+  fetchBookingInfoAction,
   fetchReservationAction,
   loginAction,
   logoutAction } from '../api-actions.ts';
@@ -12,12 +13,20 @@ const initialState: UserReducerType = {
   authorizationStatus: AuthorizationStatus.Unknown,
   authInfo: null,
   reservations: [],
+  bookings: [],
+  isBookingPageLoading: false,
+  isMyQuestsPageLoading: false,
 };
 
 export const userReducer = createSlice({
   name: NameSpace.User,
   initialState,
-  reducers: {},
+  reducers: {
+    resetUserData: (state) => {
+      state.bookings = [];
+      state.reservations = [];
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(checkAuthAction.fulfilled, (state, action) => {
@@ -45,6 +54,20 @@ export const userReducer = createSlice({
       .addCase(deleteReservationAction.fulfilled, (state, action) => {
         state.reservations = state.reservations.filter(
           (reservation) => reservation.id !== action.payload);
+      })
+      .addCase(fetchBookingInfoAction.pending, (state) => {
+        state.isBookingPageLoading = true;
+      })
+      .addCase(fetchBookingInfoAction.fulfilled, (state, action) => {
+        state.bookings = action.payload;
+        state.isBookingPageLoading = false;
+      })
+      .addCase(fetchBookingInfoAction.rejected, (state) => {
+        if (state.authInfo) {
+          state.isBookingPageLoading = false;
+        }
       });
   }
 });
+
+export const { resetUserData } = userReducer.actions;

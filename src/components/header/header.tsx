@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import { AppRoute } from '../../utils/const';
+import { useAuth } from '../../hooks/auth';
 
 function Header(): JSX.Element {
+  const userIsAuth = useAuth();
   return (
     <header className="header">
       <div className="container container--size-l">
@@ -26,20 +28,27 @@ function Header(): JSX.Element {
                 Контакты
               </Link>
             </li>
+            {userIsAuth &&
             <li className="main-nav__item">
               <Link className="link" to={AppRoute.MyQuests}>
                 Мои бронирования
               </Link>
-            </li>
+            </li>}
           </ul>
         </nav>
         <div className="header__side-nav">
-          <Link className="btn btn--accent header__side-item" to={AppRoute.Root}>
-            Выйти
-          </Link>
+          {userIsAuth
+            ?
+            <Link className="btn btn--accent header__side-item" to={AppRoute.Root}>
+              Выйти
+            </Link>
+            :
+            <Link className="btn header__side-item header__login-btn" to={AppRoute.Login}>
+              Вход
+            </Link>}
           <Link
             className="link header__side-item header__phone-link"
-            to="tel:88003335599"
+            to="tel:80001111111"
           >
             8 (000) 111-11-11
           </Link>

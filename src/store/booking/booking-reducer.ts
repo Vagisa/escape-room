@@ -2,11 +2,10 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { BookingReducerType } from '../../types/booking';
 import { NameSpace } from '../../utils/const';
 import { FullQuestType } from '../../types/quest';
-import { fetchBookingInfoAction, fetchQuestAction } from '../api-actions';
+import { fetchQuestAction } from '../api-actions';
 
 const initialState: BookingReducerType = {
   quest: null,
-  bookings: [],
   isQuestPageLoading: false,
 };
 
@@ -19,7 +18,6 @@ export const bookingReducer = createSlice({
     },
     resetQuestData: (state) => {
       state.quest = null;
-      state.bookings = [];
     },
   },
   extraReducers(builder) {
@@ -33,9 +31,6 @@ export const bookingReducer = createSlice({
       })
       .addCase(fetchQuestAction.rejected, (state) => {
         state.isQuestPageLoading = false;
-      })
-      .addCase(fetchBookingInfoAction.fulfilled, (state, action) => {
-        state.bookings = action.payload;
       });
   }
 });

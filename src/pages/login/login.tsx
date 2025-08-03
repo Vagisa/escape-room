@@ -1,7 +1,16 @@
 import { useState } from 'react';
+import { useAuth } from '../../hooks/auth';
+import { Navigate } from 'react-router-dom';
+import { AppRoute } from '../../utils/const';
 
 function Login(): JSX.Element {
+  const userIsAuth = useAuth();
   const [isChecked, setIsChecked] = useState(false);
+
+  if (userIsAuth) {
+    return <Navigate to={AppRoute.Root} />;
+  }
+
   return (
     <main className="decorated-page login">
       <div className="decorated-page__decor" aria-hidden="true">

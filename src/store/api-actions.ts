@@ -7,6 +7,7 @@ import { BookingInfoType, FullBookingType, PostBookingArg } from '../types/booki
 import { AuthDataType, AuthInfoType } from '../types/user';
 import { dropToken, saveToken } from '../services/token';
 import { redirectToRoute } from './action';
+import { selectBookingPageLoading, selectMyQuestsPageLoading } from './selectors/user';
 
 export const fetchQuestsAction = createAsyncThunk<QuestType[], undefined, {
   dispatch: AppDispatch;
@@ -106,10 +107,19 @@ export const loginAction = createAsyncThunk<AuthInfoType, AuthDataType, {
   extra: AxiosInstance;
 }>(
   'user/login',
-  async ({email, password}, { dispatch, extra: api }) => {
+  async ({email, password}, { dispatch, extra: api, getState}) => {
+    const state = getState();
+    const isBookingPageLoading = selectBookingPageLoading(state);
+    const isMyQuestsPageLoading = selectMyQuestsPageLoading(state);
     const {data} = await api.post<AuthInfoType>(APIRoute.Login, {email, password});
     saveToken(data.token);
-    dispatch(redirectToRoute(AppRoute.Root));
+    if (isBookingPageLoading) {
+      dispatch(redirectToRoute(AppRoute.Booking));
+    } else if (isMyQuestsPageLoading) {
+      dispatch(redirectToRoute(AppRoute.MyQuests));
+    } else {
+      dispatch(redirectToRoute(AppRoute.Root));
+    }
 
     return data;
   },

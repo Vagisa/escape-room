@@ -45,6 +45,5 @@ export type FullBookingType = Omit<BookingUserType, BookingRemovedKeys> & {
 
 export type BookingReducerType = {
   quest: FullQuestType | null;
-  bookings: BookingInfoType[];
   isQuestPageLoading: boolean;
 };

@@ -1,5 +1,5 @@
 import { AuthorizationStatus } from '../utils/const';
-import { FullBookingType } from './booking';
+import { BookingInfoType, FullBookingType } from './booking';
 
 export type AuthInfoType = {
   email: string;
@@ -15,4 +15,7 @@ export type UserReducerType = {
   authorizationStatus: AuthorizationStatus;
   authInfo: AuthInfoType | null;
   reservations: FullBookingType[];
+  bookings: BookingInfoType[];
+  isBookingPageLoading: boolean;
+  isMyQuestsPageLoading: boolean;
 };
