@@ -1,45 +1,50 @@
-import { FormEvent, useRef, useState } from 'react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useAuth } from '../../hooks/auth';
 import { Navigate } from 'react-router-dom';
 import { AppRoute, PasswordLength } from '../../utils/const';
 import { loginAction } from '../../store/api-actions';
 import { useAppDispatch } from '../../hooks';
 
+type FormData = {
+  email: string;
+  password: string;
+};
+
 function Login(): JSX.Element {
   const userIsAuth = useAuth();
   const [isChecked, setIsChecked] = useState(false);
-  const emailRef = useRef<HTMLInputElement | null>(null);
-  const passwordReff = useRef<HTMLInputElement | null>(null);
 
   const dispatch = useAppDispatch();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>();
 
   if (userIsAuth) {
     return <Navigate to={AppRoute.Root} />;
   }
 
-  const validatePassword = (): boolean => {
-    if (!passwordReff?.current) {
-      return false;
+  const validatePassword = (value: string) => {
+    const containsAtLeastOneNumber = /\d/.test(value);
+    const containsAtLeastOneLetter = /[a-zA-Z]/.test(value);
+
+    if (!containsAtLeastOneNumber || !containsAtLeastOneLetter) {
+      return 'Пароль должен содержать минимум одну букву и цифру';
     }
 
-    const password = passwordReff.current.value.trim();
-
-    const isCorrectLength = password.length >= PasswordLength.MIN && password.length <= PasswordLength.MAX;
-    const containsAtLeastOneNumber = /\d/.test(password);
-    const containsAtLeastOneLetter = /[a-zA-Z]/.test(password);
-
-    return isCorrectLength && containsAtLeastOneNumber && containsAtLeastOneLetter;
+    return true;
   };
 
-  const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
-    evt.preventDefault();
-
-    if (emailRef.current !== null && validatePassword()) {
-      dispatch(loginAction({
-        email: emailRef.current.value,
-        password: passwordReff?.current?.value || '',
-      }));
-    }
+  const onSubmit = (data: FormData): void => {
+    dispatch(
+      loginAction({
+        email: data.email,
+        password: data.password,
+      })
+    );
   };
 
   return (
@@ -65,7 +70,7 @@ function Login(): JSX.Element {
             className="login-form"
             action="https://echo.htmlacademy.ru/"
             method="post"
-            onSubmit={handleSubmit}
+            onSubmit={(evt) => void handleSubmit(onSubmit)(evt)}
           >
             <div className="login-form__inner-wrapper">
               <h1 className="title title--size-s login-form__title">Вход</h1>
@@ -75,26 +80,51 @@ function Login(): JSX.Element {
                     E&nbsp;&ndash;&nbsp;mail
                   </label>
                   <input
-                    ref={emailRef}
                     type="email"
                     id="email"
-                    name="email"
                     placeholder="Адрес электронной почты"
-                    required
+                    {...register('email', {
+                      required: 'Укажите email',
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: 'Некорректный email',
+                      },
+                    })}
+                    aria-invalid={errors.email ? 'true' : 'false'}
                   />
+                  {errors.email && (
+                    <span className="custom-input__error" role="alert">
+                      {errors.email.message}
+                    </span>
+                  )}
                 </div>
                 <div className="custom-input login-form__input">
                   <label className="custom-input__label" htmlFor="password">
                     Пароль
                   </label>
                   <input
-                    ref={passwordReff}
                     type="password"
                     id="password"
-                    name="password"
                     placeholder="Пароль"
-                    required
+                    {...register('password', {
+                      required: 'Укажите пароль',
+                      minLength: {
+                        value: PasswordLength.MIN,
+                        message: `Минимум ${PasswordLength.MIN} символа`,
+                      },
+                      maxLength: {
+                        value: PasswordLength.MAX,
+                        message: `Максимум ${PasswordLength.MAX} символов`,
+                      },
+                      validate: validatePassword,
+                    })}
+                    aria-invalid={errors.password ? 'true' : 'false'}
                   />
+                  {errors.password && (
+                    <span className="custom-input__error" role="alert">
+                      {errors.password.message}
+                    </span>
+                  )}
                 </div>
               </div>
               <button
