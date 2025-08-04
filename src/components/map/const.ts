@@ -4,7 +4,6 @@ const URL_MARKER_DEFAULT = '../../../../public/img/svg/pin-default.svg';
 const URL_MARKER_ACTIVE = '../../../../public/img/svg/pin-active.svg';
 
 const offerMapStyle = {
-//  width: '1144px',
   marginLeft: 'auto',
   marginRight: 'auto',
 };

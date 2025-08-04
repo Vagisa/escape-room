@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { AppRoute, CONTACT_INFO } from '../../utils/const';
 import { useAuth } from '../../hooks/auth';
 import { useAppDispatch } from '../../hooks';
@@ -6,6 +6,7 @@ import { MouseEvent } from 'react';
 import { logoutAction } from '../../store/api-actions';
 
 function Header(): JSX.Element {
+  const {pathname} = useLocation();
   const userIsAuth = useAuth();
   const dispatch = useAppDispatch();
 
@@ -28,18 +29,18 @@ function Header(): JSX.Element {
         <nav className="main-nav header__main-nav">
           <ul className="main-nav__list">
             <li className="main-nav__item">
-              <Link className="link not-disabled active" to={AppRoute.Root}>
+              <Link className={`link ${pathname === AppRoute.Root ? 'not-disabled active' : ''}`} to={AppRoute.Root}>
                 Квесты
               </Link>
             </li>
             <li className="main-nav__item">
-              <Link className="link" to={AppRoute.Contacts}>
+              <Link className={`link ${pathname === AppRoute.Contacts ? 'not-disabled active' : ''}`} to={AppRoute.Contacts}>
                 Контакты
               </Link>
             </li>
             {userIsAuth &&
             <li className="main-nav__item">
-              <Link className="link" to={AppRoute.MyQuests}>
+              <Link className={`link ${pathname === AppRoute.MyQuests ? 'not-disabled active' : ''}`} to={AppRoute.MyQuests}>
                 Мои бронирования
               </Link>
             </li>}

@@ -21,10 +21,6 @@ export const questReducer = createSlice({
     changeLevel: (state, action: PayloadAction<Level>) => {
       state.level = action.payload;
     },
-    // resetFilters: (state) => {
-    //   state.genre = QuestGenre.All;
-    //   state.level = Level.Every;
-    // },
     updateQuest: (state, action: PayloadAction<QuestType>) => {
       state.quests = state.quests.map((quest) =>
         quest.id === action.payload.id ? action.payload : quest
