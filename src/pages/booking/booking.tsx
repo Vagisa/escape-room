@@ -1,6 +1,8 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import {
   fetchQuestAction,
@@ -18,23 +20,43 @@ import LoadingScreen from '../loading-screen/loading-screen';
 import { BookingInfoType } from '../../types/booking';
 import { BookingDate } from '../../utils/const';
 
+type FormData = {
+  date: string;
+  contactPerson: string;
+  phone: string;
+  peopleCount: number;
+  withChildren: boolean;
+  agreement: boolean;
+};
+
 function Booking(): JSX.Element {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const bookings = useAppSelector(selectBookings);
   const bookingPageIsLoading = useAppSelector(selectBookingPageLoading);
   const quest = useAppSelector(selectQuest);
 
-  const [isAgreementChecked, setIsAgreementChecked] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState<BookingInfoType | null>(
     null
   );
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
-  const [contactPerson, setContactPerson] = useState<string>('');
-  const [phone, setPhone] = useState<string>('');
-  const [withChildren, setWithChildren] = useState<boolean>(false);
-  const [peopleCount, setPeopleCount] = useState<number>(0);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<FormData>({
+    defaultValues: {
+      contactPerson: '',
+      phone: '',
+      peopleCount: quest?.peopleMinMax[0] || 1,
+      withChildren: false,
+      agreement: false,
+    },
+  });
 
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -70,50 +92,36 @@ function Booking(): JSX.Element {
   const handleDateTimeChange = (date: string, time: string) => {
     setSelectedDate(date);
     setSelectedTime(time);
+    setValue('date', `${date}-${time}`);
   };
 
-  const handleContactPersonChange = (
-    evt: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setContactPerson(evt.target.value);
-  };
+  const onSubmit = async (data: FormData) => {
+    if (!selectedPlace || !selectedDate || !selectedTime) {
+      toast.error('Пожалуйста, выберите место и время');
+      return;
+    }
 
-  const handlePhoneChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    setPhone(evt.target.value);
-  };
+    try {
+      await dispatch(
+        postBookingAction({
+          questId: quest.id,
+          bookingUserData: {
+            placeId: selectedPlace.id,
+            date: selectedDate as BookingDate,
+            time: selectedTime,
+            contactPerson: data.contactPerson,
+            phone: data.phone,
+            peopleCount: data.peopleCount,
+            withChildren: data.withChildren,
+          },
+        })
+      ).unwrap();
 
-  const handlePeopleCountChange = (
-    evt: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setPeopleCount(Number(evt.target.value));
-  };
-
-  const handleWithChildrenChange = (
-    evt: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setWithChildren(evt.target.checked);
-  };
-
-  const handleAgreementChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    setIsAgreementChecked(evt.target.checked);
-  };
-
-  const handleSubmit = (evt: React.FormEvent<HTMLFormElement>) => {
-    evt.preventDefault();
-    dispatch(
-      postBookingAction({
-        questId: quest.id,
-        bookingUserData: {
-          placeId: selectedPlace.id,
-          date: selectedDate as BookingDate,
-          time: selectedTime,
-          contactPerson: contactPerson,
-          phone: phone,
-          peopleCount: peopleCount,
-          withChildren: withChildren,
-        },
-      })
-    );
+      toast.success('Бронирование успешно создано!');
+      navigate('/my-quests');
+    } catch (error) {
+      toast.error('Произошла ошибка при создании бронирования');
+    }
   };
 
   return (
@@ -156,9 +164,7 @@ function Booking(): JSX.Element {
         </div>
         <form
           className="booking-form"
-          action="https://echo.htmlacademy.ru/"
-          method="post"
-          onSubmit={handleSubmit}
+          onSubmit={() => handleSubmit(onSubmit)}
         >
           <fieldset className="booking-form__section">
             <legend className="visually-hidden">Выбор даты и времени</legend>
@@ -222,13 +228,28 @@ function Booking(): JSX.Element {
               <input
                 type="text"
                 id="name"
-                name="name"
                 placeholder="Имя"
-                required
-                pattern="[А-Яа-яЁёA-Za-z'\\- ]{1,}"
-                value={contactPerson}
-                onChange={handleContactPersonChange}
+                {...register('contactPerson', {
+                  required: 'Имя обязательно для заполнения',
+                  minLength: {
+                    value: 1,
+                    message: 'Имя должно содержать минимум 1 символ',
+                  },
+                  maxLength: {
+                    value: 15,
+                    message: 'Имя должно содержать максимум 15 символов',
+                  },
+                  pattern: {
+                    value: /^[А-Яа-яЁёA-Za-z'\s-]+$/,
+                    message: 'Имя может содержать только буквы, пробелы, апострофы и дефисы',
+                  },
+                })}
               />
+              {errors.contactPerson && (
+                <span className="custom-input__error">
+                  {errors.contactPerson.message}
+                </span>
+              )}
             </div>
             <div className="custom-input booking-form__input">
               <label className="custom-input__label" htmlFor="tel">
@@ -237,13 +258,20 @@ function Booking(): JSX.Element {
               <input
                 type="tel"
                 id="tel"
-                name="tel"
-                placeholder="Телефон"
-                required
-                pattern="^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$"
-                value={phone}
-                onChange={handlePhoneChange}
+                placeholder="+7 (000) 000-00-00"
+                {...register('phone', {
+                  required: 'Номер телефона обязателен для заполнения',
+                  pattern: {
+                    value: /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/,
+                    message: 'Введите номер в формате +7 (000) 000-00-00',
+                  },
+                })}
               />
+              {errors.phone && (
+                <span className="custom-input__error">
+                  {errors.phone.message}
+                </span>
+              )}
             </div>
             <div className="custom-input booking-form__input">
               <label className="custom-input__label" htmlFor="person">
@@ -252,20 +280,34 @@ function Booking(): JSX.Element {
               <input
                 type="number"
                 id="person"
-                name="person"
                 placeholder="Количество участников"
-                required
-                value={peopleCount}
-                onChange={handlePeopleCountChange}
+                {...register('peopleCount', {
+                  required: 'Количество участников обязательно для заполнения',
+                  min: {
+                    value: quest.peopleMinMax[0],
+                    message: `Минимальное количество участников: ${quest.peopleMinMax[0]}`,
+                  },
+                  max: {
+                    value: quest.peopleMinMax[1],
+                    message: `Максимальное количество участников: ${quest.peopleMinMax[1]}`,
+                  },
+                  valueAsNumber: true,
+                })}
               />
+              {errors.peopleCount && (
+                <span className="custom-input__error">
+                  {errors.peopleCount.message}
+                </span>
+              )}
+              <span className="custom-input__helper">
+                Доступно: {quest.peopleMinMax[0]}-{quest.peopleMinMax[1]} участников
+              </span>
             </div>
             <label className="custom-checkbox booking-form__checkbox booking-form__checkbox--children">
               <input
                 type="checkbox"
                 id="children"
-                name="children"
-                checked={withChildren}
-                onChange={handleWithChildrenChange}
+                {...register('withChildren')}
               />
               <span className="custom-checkbox__icon">
                 <svg width="20" height="17" aria-hidden="true">
@@ -287,10 +329,9 @@ function Booking(): JSX.Element {
             <input
               type="checkbox"
               id="id-order-agreement"
-              name="user-agreement"
-              checked={isAgreementChecked}
-              required
-              onChange={handleAgreementChange}
+              {...register('agreement', {
+                required: 'Необходимо согласиться с условиями',
+              })}
             />
             <span className="custom-checkbox__icon">
               <svg width="20" height="17" aria-hidden="true">
@@ -305,6 +346,11 @@ function Booking(): JSX.Element {
               &nbsp;и пользовательским соглашением
             </span>
           </label>
+          {errors.agreement && (
+            <span className="custom-input__error">
+              {errors.agreement.message}
+            </span>
+          )}
         </form>
       </div>
     </main>
