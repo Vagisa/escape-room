@@ -95,7 +95,7 @@ function Booking(): JSX.Element {
     setValue('date', `${date}-${time}`);
   };
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: FormData): Promise<void> => {
     if (!selectedPlace || !selectedDate || !selectedTime) {
       toast.error('Пожалуйста, выберите место и время');
       return;
@@ -164,7 +164,7 @@ function Booking(): JSX.Element {
         </div>
         <form
           className="booking-form"
-          onSubmit={() => handleSubmit(onSubmit)}
+          onSubmit={(evt) => void handleSubmit(onSubmit)(evt)}
         >
           <fieldset className="booking-form__section">
             <legend className="visually-hidden">Выбор даты и времени</legend>
@@ -197,7 +197,7 @@ function Booking(): JSX.Element {
               <fieldset className="booking-form__date-section">
                 <legend className="booking-form__date-title">Завтра</legend>
                 <div className="booking-form__date-inner-wrapper">
-                  {selectedPlace.slots.today.map((slot) => (
+                  {selectedPlace.slots.tomorrow.map((slot) => (
                     <label
                       className="custom-radio booking-form__date"
                       key={slot.time}
