@@ -1,3 +1,7 @@
+import { Link } from 'react-router-dom';
+import Map from '../../components/map/map';
+import { CONTACT_INFO, CONTACT_PLACES } from '../../utils/const';
+
 function Contacts(): JSX.Element {
   return (
     <main className="page-content decorated-page">
@@ -29,38 +33,35 @@ function Contacts(): JSX.Element {
               <dt className="contacts__dt">Адрес</dt>
               <dd className="contacts__dd">
                 <address className="contacts__address">
-                  Санкт-Петербург,
-                  <br /> Набережная реки Карповка, д 5П
+                  {CONTACT_INFO.city},<br/> {CONTACT_INFO.address}
                 </address>
               </dd>
             </div>
             <div className="contacts__item">
               <dt className="contacts__dt">Режим работы</dt>
               <dd className="contacts__dd">
-                Ежедневно, с&nbsp;10:00 до&nbsp;22:00
+                {CONTACT_INFO.working}, с&nbsp;{CONTACT_INFO.hours.from} до&nbsp;{CONTACT_INFO.hours.to}
               </dd>
             </div>
             <div className="contacts__item">
               <dt className="contacts__dt">Телефон</dt>
               <dd className="contacts__dd">
-                <a className="link" href="tel:88003335599">
-                  8 (000) 111-11-11
-                </a>
+                <Link className="link" to={CONTACT_INFO.phone.raw}>
+                  {CONTACT_INFO.phone.formatted}
+                </Link>
               </dd>
             </div>
             <div className="contacts__item">
               <dt className="contacts__dt">E&ndash;mail</dt>
               <dd className="contacts__dd">
-                <a className="link" href="mailto:info@escape-room.ru">
-                  info@escape-room.ru
+                <a className="link" href={`mailto:${CONTACT_INFO.email}`}>
+                  {CONTACT_INFO.email}
                 </a>
               </dd>
             </div>
           </dl>
           <div className="contacts__map">
-            <div className="map">
-              <div className="map__container"></div>
-            </div>
+            <Map selectedPlace={CONTACT_PLACES[0]} places={CONTACT_PLACES}/>
           </div>
         </div>
       </div>

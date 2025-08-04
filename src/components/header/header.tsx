@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { AppRoute } from '../../utils/const';
+import { AppRoute, CONTACT_INFO } from '../../utils/const';
 import { useAuth } from '../../hooks/auth';
 import { useAppDispatch } from '../../hooks';
 import { MouseEvent } from 'react';
@@ -61,9 +61,9 @@ function Header(): JSX.Element {
             </Link>}
           <Link
             className="link header__side-item header__phone-link"
-            to="tel:80001111111"
+            to={CONTACT_INFO.phone.raw}
           >
-            8 (000) 111-11-11
+            {CONTACT_INFO.phone.formatted}
           </Link>
         </div>
       </div>

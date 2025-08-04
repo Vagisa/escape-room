@@ -1,3 +1,34 @@
+import { BookingInfoType } from '../types/booking';
+
+export const CONTACT_PLACES: BookingInfoType[] = [
+  {
+    id: '1',
+    location: {
+      address: 'Санкт-Петербург, Набережная реки Карповки, д 5П',
+      coords: [59.9703, 30.3136],
+    },
+    slots: {
+      today: [],
+      tomorrow: [],
+    },
+  },
+];
+
+export const CONTACT_INFO = {
+  city: 'Санкт-Петербург',
+  address: 'Набережная реки Карповка, д 5П',
+  working: 'Ежедневно',
+  hours: {
+    from: '10:00',
+    to: '22:00',
+  },
+  email: 'info@escape-room.ru',
+  phone: {
+    raw: '80001111111',
+    formatted: '8 (000) 111-11-11',
+  }
+};
+
 export enum AppRoute {
   Root = '/',
   Quest = '/quest/:id',

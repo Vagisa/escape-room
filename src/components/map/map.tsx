@@ -8,7 +8,7 @@ import { BookingInfoType } from '../../types/booking';
 type MapProps = {
   places: BookingInfoType[];
   selectedPlace: BookingInfoType | null;
-  onPlaceClick: (place: BookingInfoType) => void;
+  onPlaceClick?: (place: BookingInfoType) => void;
 };
 
 function Map({ selectedPlace, places, onPlaceClick }: MapProps): JSX.Element {
@@ -32,14 +32,17 @@ function Map({ selectedPlace, places, onPlaceClick }: MapProps): JSX.Element {
     places.forEach((place) => {
       const [lat, lng] = place.location.coords;
       const marker = new Marker([lat, lng]);
-      marker.setIcon(
-        selectedPlace && place.id === selectedPlace.id
-          ? currentCustomIcon
-          : defaultCustomIcon
-      )
+      marker
+        .setIcon(
+          selectedPlace && place.id === selectedPlace.id
+            ? currentCustomIcon
+            : defaultCustomIcon
+        )
         .addTo(markersLayer)
         .on('click', () => {
-          onPlaceClick(place);
+          if (onPlaceClick) {
+            onPlaceClick(place);
+          }
         });
     });
 
@@ -50,8 +53,7 @@ function Map({ selectedPlace, places, onPlaceClick }: MapProps): JSX.Element {
 
   return (
     <div className="map">
-      <div className="map__container" ref={mapRef} style={offerMapStyle}>
-      </div>
+      <div className="map__container" ref={mapRef} style={offerMapStyle}></div>
     </div>
   );
 }
