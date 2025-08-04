@@ -58,7 +58,7 @@ export const postBookingAction = createAsyncThunk<FullBookingType, PostBookingAr
   async ({questId, bookingUserData}, {dispatch, extra: api}) => {
     const {data} = await api.post<FullBookingType>
     (APIRoute.Quest + questId + APIRoute.Booking, bookingUserData);
-    dispatch(fetchBookingInfoAction(data.id));
+    dispatch(redirectToRoute(AppRoute.MyQuests));
     return data;
   }
 );

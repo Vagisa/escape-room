@@ -1,23 +1,119 @@
+import { useParams } from 'react-router-dom';
 import { useState } from 'react';
-import { useAppSelector } from '../../hooks';
-import { selectBookingPageLoading, selectBookings } from '../../store/selectors/user';
+import { useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import {
+  fetchQuestAction,
+  fetchBookingInfoAction,
+  postBookingAction,
+} from '../../store/api-actions';
+import { resetQuestData } from '../../store/booking/booking-reducer';
+import {
+  selectBookingPageLoading,
+  selectBookings,
+} from '../../store/selectors/user';
+import { selectQuest } from '../../store/selectors/booking';
 import Map from '../../components/map/map';
 import LoadingScreen from '../loading-screen/loading-screen';
 import { BookingInfoType } from '../../types/booking';
+import { BookingDate } from '../../utils/const';
 
 function Booking(): JSX.Element {
-  const [isChecked, setIsChecked] = useState(false);
+  const { id } = useParams();
+
   const bookings = useAppSelector(selectBookings);
   const bookingPageIsLoading = useAppSelector(selectBookingPageLoading);
+  const quest = useAppSelector(selectQuest);
 
-  const [selectedPlace, setSelectedPlace] = useState<BookingInfoType>(bookings[0]);
+  const [isAgreementChecked, setIsAgreementChecked] = useState(false);
+  const [selectedPlace, setSelectedPlace] = useState<BookingInfoType | null>(
+    null
+  );
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedTime, setSelectedTime] = useState<string>('');
+  const [contactPerson, setContactPerson] = useState<string>('');
+  const [phone, setPhone] = useState<string>('');
+  const [withChildren, setWithChildren] = useState<boolean>(false);
+  const [peopleCount, setPeopleCount] = useState<number>(0);
 
-  if (bookingPageIsLoading) {
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchQuestAction(id));
+      dispatch(fetchBookingInfoAction(id));
+    }
+
+    return () => {
+      dispatch(resetQuestData());
+    };
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (bookings.length > 0) {
+      setSelectedPlace(bookings[0]);
+    }
+  }, [bookings]);
+
+  if (
+    !quest ||
+    bookings.length === 0 ||
+    bookingPageIsLoading ||
+    !selectedPlace
+  ) {
     return <LoadingScreen />;
   }
 
   const handlePlaceClick = (place: BookingInfoType) => {
     setSelectedPlace(place);
+  };
+
+  const handleDateTimeChange = (date: string, time: string) => {
+    setSelectedDate(date);
+    setSelectedTime(time);
+  };
+
+  const handleContactPersonChange = (
+    evt: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setContactPerson(evt.target.value);
+  };
+
+  const handlePhoneChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    setPhone(evt.target.value);
+  };
+
+  const handlePeopleCountChange = (
+    evt: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setPeopleCount(Number(evt.target.value));
+  };
+
+  const handleWithChildrenChange = (
+    evt: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setWithChildren(evt.target.checked);
+  };
+
+  const handleAgreementChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    setIsAgreementChecked(evt.target.checked);
+  };
+
+  const handleSubmit = (evt: React.FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+    dispatch(
+      postBookingAction({
+        questId: quest.id,
+        bookingUserData: {
+          placeId: selectedPlace.id,
+          date: selectedDate as BookingDate,
+          time: selectedTime,
+          contactPerson: contactPerson,
+          phone: phone,
+          peopleCount: peopleCount,
+          withChildren: withChildren,
+        },
+      })
+    );
   };
 
   return (
@@ -26,14 +122,14 @@ function Booking(): JSX.Element {
         <picture>
           <source
             type="image/webp"
-            srcSet="img/content/maniac/maniac-bg-size-m.webp, img/content/maniac/maniac-bg-size-m@2x.webp 2x"
+            srcSet={`${quest.previewImgWebp}, ${quest.coverImgWebp} 2x`}
           />
           <img
-            src="img/content/maniac/maniac-bg-size-m.jpg"
-            srcSet="img/content/maniac/maniac-bg-size-m@2x.jpg 2x"
+            src={quest.previewImg}
+            srcSet={`${quest.coverImg} 2x`}
             width="1366"
             height="1959"
-            alt=""
+            alt={quest.title}
           />
         </picture>
       </div>
@@ -43,15 +139,18 @@ function Booking(): JSX.Element {
             Бронирование квеста
           </h1>
           <p className="title title--size-m title--uppercase page-content__title">
-            Маньяк
+            {quest.title}
           </p>
         </div>
         <div className="page-content__item">
           <div className="booking-map">
-            <Map selectedPlace={selectedPlace} places={bookings} onPlaceClick={handlePlaceClick} />
+            <Map
+              selectedPlace={selectedPlace}
+              places={bookings}
+              onPlaceClick={handlePlaceClick}
+            />
             <p className="booking-map__address">
-              Вы&nbsp;выбрали: наб. реки Карповки&nbsp;5, лит&nbsp;П, м.
-              Петроградская
+              Вы&nbsp;выбрали: {selectedPlace.location.address}
             </p>
           </div>
         </div>
@@ -59,123 +158,60 @@ function Booking(): JSX.Element {
           className="booking-form"
           action="https://echo.htmlacademy.ru/"
           method="post"
+          onSubmit={handleSubmit}
         >
           <fieldset className="booking-form__section">
             <legend className="visually-hidden">Выбор даты и времени</legend>
-            <fieldset className="booking-form__date-section">
-              <legend className="booking-form__date-title">Сегодня</legend>
-              <div className="booking-form__date-inner-wrapper">
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="today9h45m"
-                    name="date"
-                    required
-                    value="today9h45m"
-                  />
-                  <span className="custom-radio__label">9:45</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="today15h00m"
-                    name="date"
-                    checked
-                    required
-                    value="today15h00m"
-                  />
-                  <span className="custom-radio__label">15:00</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="today17h30m"
-                    name="date"
-                    required
-                    value="today17h30m"
-                  />
-                  <span className="custom-radio__label">17:30</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="today19h30m"
-                    name="date"
-                    required
-                    value="today19h30m"
-                    disabled
-                  />
-                  <span className="custom-radio__label">19:30</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="today21h30m"
-                    name="date"
-                    required
-                    value="today21h30m"
-                  />
-                  <span className="custom-radio__label">21:30</span>
-                </label>
-              </div>
-            </fieldset>
-            <fieldset className="booking-form__date-section">
-              <legend className="booking-form__date-title">Завтра</legend>
-              <div className="booking-form__date-inner-wrapper">
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="tomorrow11h00m"
-                    name="date"
-                    required
-                    value="tomorrow11h00m"
-                  />
-                  <span className="custom-radio__label">11:00</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="tomorrow15h00m"
-                    name="date"
-                    required
-                    value="tomorrow15h00m"
-                    disabled
-                  />
-                  <span className="custom-radio__label">15:00</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="tomorrow17h30m"
-                    name="date"
-                    required
-                    value="tomorrow17h30m"
-                    disabled
-                  />
-                  <span className="custom-radio__label">17:30</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="tomorrow19h45m"
-                    name="date"
-                    required
-                    value="tomorrow19h45m"
-                  />
-                  <span className="custom-radio__label">19:45</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="tomorrow21h30m"
-                    name="date"
-                    required
-                    value="tomorrow21h30m"
-                  />
-                  <span className="custom-radio__label">21:30</span>
-                </label>
-              </div>
-            </fieldset>
+            {selectedPlace.slots.today.length > 0 && (
+              <fieldset className="booking-form__date-section">
+                <legend className="booking-form__date-title">Сегодня</legend>
+                <div className="booking-form__date-inner-wrapper">
+                  {selectedPlace.slots.today.map((slot) => (
+                    <label
+                      className="custom-radio booking-form__date"
+                      key={slot.time}
+                    >
+                      <input
+                        type="radio"
+                        id={slot.time}
+                        name="date"
+                        disabled={!slot.isAvailable}
+                        required
+                        value={slot.time}
+                        onChange={() =>
+                          handleDateTimeChange('today', slot.time)}
+                      />
+                      <span className="custom-radio__label">{slot.time}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
+            {selectedPlace.slots.tomorrow.length > 0 && (
+              <fieldset className="booking-form__date-section">
+                <legend className="booking-form__date-title">Завтра</legend>
+                <div className="booking-form__date-inner-wrapper">
+                  {selectedPlace.slots.today.map((slot) => (
+                    <label
+                      className="custom-radio booking-form__date"
+                      key={slot.time}
+                    >
+                      <input
+                        type="radio"
+                        id={slot.time}
+                        name="date"
+                        disabled={!slot.isAvailable}
+                        required
+                        value={slot.time}
+                        onChange={() =>
+                          handleDateTimeChange('tomorrow', slot.time)}
+                      />
+                      <span className="custom-radio__label">{slot.time}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
           </fieldset>
           <fieldset className="booking-form__section">
             <legend className="visually-hidden">Контактная информация</legend>
@@ -189,7 +225,9 @@ function Booking(): JSX.Element {
                 name="name"
                 placeholder="Имя"
                 required
-                pattern="[А-Яа-яЁёA-Za-z'- ]{1,}"
+                pattern="[А-Яа-яЁёA-Za-z'\\- ]{1,}"
+                value={contactPerson}
+                onChange={handleContactPersonChange}
               />
             </div>
             <div className="custom-input booking-form__input">
@@ -202,7 +240,9 @@ function Booking(): JSX.Element {
                 name="tel"
                 placeholder="Телефон"
                 required
-                pattern="[0-9]{10,}"
+                pattern="^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$"
+                value={phone}
+                onChange={handlePhoneChange}
               />
             </div>
             <div className="custom-input booking-form__input">
@@ -215,10 +255,18 @@ function Booking(): JSX.Element {
                 name="person"
                 placeholder="Количество участников"
                 required
+                value={peopleCount}
+                onChange={handlePeopleCountChange}
               />
             </div>
             <label className="custom-checkbox booking-form__checkbox booking-form__checkbox--children">
-              <input type="checkbox" id="children" name="children" checked />
+              <input
+                type="checkbox"
+                id="children"
+                name="children"
+                checked={withChildren}
+                onChange={handleWithChildrenChange}
+              />
               <span className="custom-checkbox__icon">
                 <svg width="20" height="17" aria-hidden="true">
                   <use xlinkHref="#icon-tick"></use>
@@ -240,9 +288,9 @@ function Booking(): JSX.Element {
               type="checkbox"
               id="id-order-agreement"
               name="user-agreement"
-              checked={isChecked}
+              checked={isAgreementChecked}
               required
-              onChange={(evt) => setIsChecked(evt.target.checked)}
+              onChange={handleAgreementChange}
             />
             <span className="custom-checkbox__icon">
               <svg width="20" height="17" aria-hidden="true">

@@ -2,10 +2,10 @@ import { Link, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { selectQuest, selectQuestPageLoading } from '../../store/selectors/booking';
 import { useEffect } from 'react';
-import { fetchBookingInfoAction, fetchQuestAction } from '../../store/api-actions';
+import { fetchQuestAction } from '../../store/api-actions';
 import LoadingScreen from '../loading-screen/loading-screen';
 import NotFound from '../not-found/not-found';
-import { AppRoute } from '../../utils/const';
+import { APIRoute } from '../../utils/const';
 import { resetQuestData } from '../../store/booking/booking-reducer';
 
 function Quest(): JSX.Element {
@@ -18,7 +18,6 @@ function Quest(): JSX.Element {
   useEffect(() => {
     if (id) {
       dispatch(fetchQuestAction(id));
-      dispatch(fetchBookingInfoAction(id));
     }
 
     return () => {
@@ -90,7 +89,7 @@ function Quest(): JSX.Element {
           </p>
           <Link
             className="btn btn--accent btn--cta quest-page__btn"
-            to={AppRoute.Booking}
+            to={`${APIRoute.Quest}${id || ''}${APIRoute.Booking}`}
           >
             Забронировать
           </Link>
