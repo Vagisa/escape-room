@@ -27,7 +27,7 @@ function ReservationCard(props: ReservationCardProps): JSX.Element {
 
   const handleCancelButtonClick = (evt: React.MouseEvent<HTMLButtonElement>) => {
     evt.preventDefault();
-    dispatch(deleteReservationAction(id));
+    dispatch(deleteReservationAction(props.id));
   };
 
   return (
