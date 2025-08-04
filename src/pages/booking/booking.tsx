@@ -1,7 +1,25 @@
 import { useState } from 'react';
+import { useAppSelector } from '../../hooks';
+import { selectBookingPageLoading, selectBookings } from '../../store/selectors/user';
+import Map from '../../components/map/map';
+import LoadingScreen from '../loading-screen/loading-screen';
+import { BookingInfoType } from '../../types/booking';
 
 function Booking(): JSX.Element {
   const [isChecked, setIsChecked] = useState(false);
+  const bookings = useAppSelector(selectBookings);
+  const bookingPageIsLoading = useAppSelector(selectBookingPageLoading);
+
+  const [selectedPlace, setSelectedPlace] = useState<BookingInfoType>(bookings[0]);
+
+  if (bookingPageIsLoading) {
+    return <LoadingScreen />;
+  }
+
+  const handlePlaceClick = (place: BookingInfoType) => {
+    setSelectedPlace(place);
+  };
+
   return (
     <main className="page-content decorated-page">
       <div className="decorated-page__decor" aria-hidden="true">
@@ -30,9 +48,7 @@ function Booking(): JSX.Element {
         </div>
         <div className="page-content__item">
           <div className="booking-map">
-            <div className="map">
-              <div className="map__container"></div>
-            </div>
+            <Map selectedPlace={selectedPlace} places={bookings} onPlaceClick={handlePlaceClick} />
             <p className="booking-map__address">
               Вы&nbsp;выбрали: наб. реки Карповки&nbsp;5, лит&nbsp;П, м.
               Петроградская
