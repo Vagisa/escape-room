@@ -4,7 +4,7 @@ import './not-found.css';
 function NotFound(): JSX.Element {
   return (
     <main className="page-content page__not-found">
-      <div className="container">
+      <div className="container container__not-found">
         <h1>
           404. Page not found.
         </h1>

@@ -1,6 +1,14 @@
 .page__not-found {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.container__not-found {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-};
+}
 
 .link__not-found {
   font-size: 150%;
@@ -8,7 +16,6 @@
 };
 
 .img__not-found {
-  margin-bottom: 50px;
   max-width: 100%;
   height: auto;
 };

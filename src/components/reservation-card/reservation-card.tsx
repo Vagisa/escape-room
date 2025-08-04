@@ -3,6 +3,8 @@ import { QuestType } from '../../types/quest';
 import { addImageSuffix } from '../../utils/utils';
 import { APIRoute, BookingDate, BookingDateLabel } from '../../utils/const';
 import { LocationType } from '../../types/booking';
+import { deleteReservationAction } from '../../store/api-actions';
+import { useAppDispatch } from '../../hooks';
 
 type ReservationCardProps = {
     date: BookingDate;
@@ -21,6 +23,12 @@ function ReservationCard(props: ReservationCardProps): JSX.Element {
     previewImgWebp,
     level
   } = props.quest;
+  const dispatch = useAppDispatch();
+
+  const handleCancelButtonClick = (evt: React.MouseEvent<HTMLButtonElement>) => {
+    evt.preventDefault();
+    dispatch(deleteReservationAction(id));
+  };
 
   return (
     <div className="quest-card">
@@ -65,6 +73,7 @@ function ReservationCard(props: ReservationCardProps): JSX.Element {
         <button
           className="btn btn--accent btn--secondary quest-card__btn"
           type="button"
+          onClick={handleCancelButtonClick}
         >
           Отменить
         </button>
