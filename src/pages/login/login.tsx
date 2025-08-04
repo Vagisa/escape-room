@@ -1,7 +1,7 @@
 import { FormEvent, useRef, useState } from 'react';
 import { useAuth } from '../../hooks/auth';
 import { Navigate } from 'react-router-dom';
-import { AppRoute } from '../../utils/const';
+import { AppRoute, PasswordLength } from '../../utils/const';
 import { loginAction } from '../../store/api-actions';
 import { useAppDispatch } from '../../hooks';
 
@@ -17,13 +17,18 @@ function Login(): JSX.Element {
     return <Navigate to={AppRoute.Root} />;
   }
 
-  const validatePassword = () => {
-    if (passwordReff === null || passwordReff.current === null) {
+  const validatePassword = (): boolean => {
+    if (!passwordReff?.current) {
       return false;
     }
-    const containsAtLeastOneNumber = /\d/.test(passwordReff.current.value);
-    const containsAtLeastOneLetter = /[a-zA-Z]/.test(passwordReff.current.value);
-    return containsAtLeastOneNumber && containsAtLeastOneLetter;
+
+    const password = passwordReff.current.value.trim();
+
+    const isCorrectLength = password.length >= PasswordLength.MIN && password.length <= PasswordLength.MAX;
+    const containsAtLeastOneNumber = /\d/.test(password);
+    const containsAtLeastOneLetter = /[a-zA-Z]/.test(password);
+
+    return isCorrectLength && containsAtLeastOneNumber && containsAtLeastOneLetter;
   };
 
   const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {

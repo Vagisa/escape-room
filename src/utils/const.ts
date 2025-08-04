@@ -29,6 +29,11 @@ export const CONTACT_INFO = {
   }
 };
 
+export const PasswordLength = {
+  MIN: 3,
+  MAX: 15,
+};
+
 export enum AppRoute {
   Root = '/',
   Quest = '/quest/:id',
